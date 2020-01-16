@@ -1,49 +1,73 @@
-const db = require('./userDb')
 const { handle500 } = require('../../globalMW')
-const { validateUserId } = require('../apiMW')
-const express = require('express')
-const router = express.Router()
+const db = require('./userDb')
+const postDb = require('../posts/postDb')
+const { validateId, validatePost } = require('../apiMW')
+const { validateUser } = require('./userMW')
+const router = require('express').Router()
 
-router.post('/', (req, res) => {
-  // do your magic!
-})
+router.post('/', validateUser, (req, res) =>
+  db
+    .insert(req.body)
+    .then(newUser => res.status(201).json(newUser))
+    .catch(e => res.status(500).json({ message: e.message }))
+)
 
-router.post('/:id/posts', (req, res) => {
-  // do your magic!
-})
+router.post('/:id/posts', validateId(db), validatePost, (req, res) =>
+  postDb
+    .insert({ ...req.body, user_id: req.params.id })
+    .then(newPost => res.status(201).json(newPost))
+    .catch(e => res.status(500).json({ message: e.message }))
+)
 
 router.get('/', (req, res) =>
   db
     .get()
     .then(userArray => res.status(200).json(userArray))
-    .catch(() => res.status(500).json({ error: 'Could not get users!' }))
+    .catch(e => res.status(500).json({ message: e.message }))
 )
 
-router.get('/:id', validateUserId(db), (req, res) =>
-  res.status(200).json(req.body.user)
+router.get('/:id', validateId(db), (req, res) => res.status(200).json(req.user))
+
+router.get('/:id/posts', validateId(db), (req, res) =>
+  db
+    .getUserPosts(req.params.id)
+    .then(userPosts => res.status(200).json(userPosts))
+    .catch(e => res.status(500).json({ message: e.message }))
 )
 
-router.get('/:id/posts', (req, res) => {
-  // do your magic!
-})
+router.delete('/:id', validateId(db), (req, res) =>
+  db
+    .remove(req.params.id)
+    .then(numRemoved =>
+      res.status(200).json({
+        message: `Successfully removed ${numRemoved} users`,
+      })
+    )
+    .catch(e => res.status(500).json({ message: e.message }))
+)
 
-router.delete('/:id', (req, res) => {
-  // do your magic!
-})
+router.put('/:id', validateId(db), validateUser, (req, res) =>
+  db
+    .update(req.params.id, req.body)
+    .then(numUpdated =>
+      res.status(200).json({
+        message: `Successfully updated ${numUpdated} users`,
+      })
+    )
+    .catch(e => res.status(500).json({ message: e.message }))
+)
 
-router.put('/:id', (req, res) => {
-  // do your magic!
-})
+// router.get(['/', '/:misc', '/:misc/:misc', '/:misc/:misc/:misc'], () => {
+//   throw new Error(
+//     `Make sure you're using a valid path for GET: /api/users OR /api/users/:id OR /api/users/:id/posts`
+//   )
+// })
 
-//custom middleware
-
-function validateUser(req, res, next) {
-  // do your magic!
-}
-
-function validatePost(req, res, next) {
-  // do your magic!
-}
+// router.post(['/', '/:misc', '/:misc/:misc', '/:misc/:misc/:misc'], () => {
+//   throw new Error(
+//     `Make sure you're using a valid path for POST: /api/users OR /api/users/:id/posts`
+//   )
+// })
 
 router.use(handle500)
 

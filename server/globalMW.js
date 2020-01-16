@@ -11,14 +11,17 @@ const logger = (req, res, next) => {
   next()
 }
 
-const handle500 = (err, req, res, next) => {
-  console.log(err)
+const handle500 = (err, req, res, next) =>
   res
     .status(500)
-    .json({ message: '500: Internal Server Error', location: req.originalUrl })
-}
+    .json({
+      message: '500: Internal Server Error',
+      location: req.originalUrl,
+      error: err.message,
+    })
+const middleware = [logger, express.json(), cors()]
 
 module.exports = {
-  middleware: [logger, express.json(), cors()],
-  handle500: handle500,
+  middleware,
+  handle500,
 }
