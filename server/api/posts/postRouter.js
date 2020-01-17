@@ -2,7 +2,6 @@ const { handle500 } = require('../../globalMW')
 const db = require('./postDb')
 const express = require('express')
 const { validateId, validatePost } = require('../apiMW')
-
 const router = express.Router()
 
 router.get('/', (req, res) =>

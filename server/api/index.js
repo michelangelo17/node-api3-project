@@ -8,10 +8,22 @@ module.exports = [
   router.use('/users', userRouter),
 ]
 
-router.get(['/', '/:misc', '/:misc/:misc', '/:misc/:misc/:misc'], () => {
-  throw new Error(
-    `Make sure you're using a valid path: /api/users OR /api/posts`
-  )
-})
+const allPaths = [
+  '/',
+  '/:misc',
+  '/:misc/:misc',
+  '/:misc/:misc/:misc',
+  '/:misc/:misc/:misc/:misc',
+  '/:misc/:misc/:misc/:misc/:misc',
+  '/misc/:misc/:misc/:misc/:misc/:misc',
+]
 
-router.use(handle500)
+router.use(
+  allPaths,
+  () => {
+    throw new Error(
+      `Make sure you're using a valid path: /api/users OR /api/posts`
+    )
+  },
+  handle500
+)

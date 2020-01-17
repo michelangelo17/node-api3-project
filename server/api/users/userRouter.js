@@ -57,18 +57,6 @@ router.put('/:id', validateId(db), validateUser, (req, res) =>
     .catch(e => res.status(500).json({ message: e.message }))
 )
 
-// router.get(['/', '/:misc', '/:misc/:misc', '/:misc/:misc/:misc'], () => {
-//   throw new Error(
-//     `Make sure you're using a valid path for GET: /api/users OR /api/users/:id OR /api/users/:id/posts`
-//   )
-// })
-
-// router.post(['/', '/:misc', '/:misc/:misc', '/:misc/:misc/:misc'], () => {
-//   throw new Error(
-//     `Make sure you're using a valid path for POST: /api/users OR /api/users/:id/posts`
-//   )
-// })
-
 router.use(handle500)
 
 module.exports = router
